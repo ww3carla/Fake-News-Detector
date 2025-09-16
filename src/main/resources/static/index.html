@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fake News Detector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .container{
+            max-width: 600px;
+            margin: auto;
+        }
+        textarea, input{
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .result{
+            margin-top: 20px;
+            padding: 13px;
+            border: 1px solid #dddd;
+            background: rgba(255, 153, 255, 0.71);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+     <h1>Fake News Detector 📰</h1>
+
+    <h3>Check text</h3>
+    <textarea id="textInput" rows="4" placeholder="Enter news text..."></textarea>
+    <button onclick="checkText()">Check Text</button>
+
+    <h3>Check URL</h3>
+    <input type="text" id="urlInput" placeholder="Enter article URL...">
+    <button onclick="checkUrl()">Check URL</button>
+
+    <div id="result" class="result" style="display:none;"></div>
+</div>
+
+<script>
+    async function checkText() {
+        const text = document.getElementById("textInput").value;
+        const response = await fetch("/classify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text })
+        });
+        const data = await response.json();
+        showResult(data);
+    }
+
+    async function checkUrl() {
+        const url = document.getElementById("urlInput").value;
+        const response = await fetch(`/classify-url?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        showResult(data);
+    }
+
+    function showResult(data) {
+        const resultDiv = document.getElementById("result");
+        resultDiv.style.display = "block";
+        resultDiv.innerHTML = `
+            <strong>Predicted:</strong> ${data.predicted || "N/A"} <br>
+            <strong>Scores:</strong> Fake: ${data.scores?.fake}, Real: ${data.scores?.real} <br>
+            ${data.article_title ? `<strong>Title:</strong> ${data.article_title}<br>` : ""}
+            ${data.url ? `<strong>URL:</strong> <a href="${data.url}" target="_blank">${data.url}</a>` : ""}
+        `;
+    }
+</script>
+</body>
+</html>
