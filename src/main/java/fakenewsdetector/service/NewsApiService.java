@@ -9,7 +9,7 @@ import java.util.Objects;
 @Service
 public class NewsApiService {
 
-    private static final String API_KEY = "0d308cef6ea24378bbd0ec2918822f09";
+    private static final String API_KEY = "API_KEY";
     private final RestTemplate restTemplate = new RestTemplate();
 
     public List<Map<String, Object>> getTopHeadlines() {
